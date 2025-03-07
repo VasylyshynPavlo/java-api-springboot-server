@@ -33,6 +33,13 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
+    @PutMapping(path = "/{id}", consumes = MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateCategory(@PathVariable Integer id, @ModelAttribute CategoryPostDto category) {
+        return categoryService.updateCategory(id, category)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.notFound().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Integer id) {
         return categoryService.deleteCategory(id)

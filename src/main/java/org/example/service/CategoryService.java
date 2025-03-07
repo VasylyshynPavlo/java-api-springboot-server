@@ -34,9 +34,26 @@ public class CategoryService {
         if (newImageFile!=null && !newImageFile.isEmpty()){
             var imagePath = fileService.load(newImageFile);
             entity.setImage(imagePath);
-            System.out.println("Received file: " + newImageFile.getOriginalFilename());
         }
         return categoryRepository.save(entity);
+    }
+
+    public boolean updateCategory(Integer id, CategoryPostDto category) {
+        var res = categoryRepository.findById(id);
+        if (res.isEmpty()){
+            return false;
+        }
+        var entity = res.get();
+        entity.setName(category.getName());
+        entity.setDescription(category.getDescription());
+
+        var newImageFile = category.getImageFile();
+        if (newImageFile!=null && !newImageFile.isEmpty()){
+            var newImagePath = fileService.replace(entity.getImage(), category.getImageFile());
+            entity.setImage(newImagePath);
+        }
+        categoryRepository.save(entity);
+        return true;
     }
 
     public boolean deleteCategory(Integer id) {
