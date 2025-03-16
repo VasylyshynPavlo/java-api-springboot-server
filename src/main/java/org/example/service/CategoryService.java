@@ -1,12 +1,12 @@
 package org.example.service;
 
 import lombok.AllArgsConstructor;
+import org.example.dto.category.CategoryItemDTO;
+import org.example.dto.category.CategoryPostDto;
 import org.example.entities.CategoryEntity;
 import org.example.mapper.CategoryMapper;
 import org.example.repository.ICategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.example.dto.category.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,14 +16,14 @@ import java.util.List;
 public class CategoryService {
     private ICategoryRepository categoryRepository;
     private FileService fileService;
-    private CategoryMapper categoryMapper;
+    private CategoryMapper CategoryMapper;
 
     public List<CategoryItemDTO> getAllCategories() {
-        return categoryMapper.toDto(categoryRepository.findAll());
+        return CategoryMapper.toDto(categoryRepository.findAll());
     }
 
     public CategoryItemDTO getCategoryById(Integer id) {
-        return categoryMapper.toDto(categoryRepository.findById(id).get());
+        return CategoryMapper.toDto(categoryRepository.findById(id).get());
     }
     public CategoryEntity createCategory(CategoryPostDto category) {
         var entity = new CategoryEntity();

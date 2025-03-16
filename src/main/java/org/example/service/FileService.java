@@ -24,9 +24,9 @@ public class FileService {
     private String extension = "webp";
 
     private final Map<String, Integer> sizeMap = Map.of(
-            "small", 30,
-            "medium", 100,
-            "large", 1000
+            "small", 500,
+            "medium", 1000,
+            "large", 2000
     );
 
     public String load(MultipartFile file) {
