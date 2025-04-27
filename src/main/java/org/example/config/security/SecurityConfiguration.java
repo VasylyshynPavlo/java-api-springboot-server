@@ -16,13 +16,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-//    private final LogoutHandler logoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/products").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/categories").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/user").permitAll()
+
                         .requestMatchers("/static/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
@@ -30,7 +42,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/rest-api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/categories").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

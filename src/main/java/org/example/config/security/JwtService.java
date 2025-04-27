@@ -75,6 +75,7 @@ public class JwtService {
     }
 
     public boolean validate(String token) {
+        System.out.println("Validating token: " + token);
         try {
             SecretKey key = getSecretKey();
             Jwts.parser().verifyWith(key).build().parse(token);
@@ -91,5 +92,13 @@ public class JwtService {
             System.out.println("JWT claims string is empty - " + ex.getMessage());
         }
         return false;
+    }
+
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

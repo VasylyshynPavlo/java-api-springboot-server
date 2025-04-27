@@ -4,47 +4,62 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.config.security.JwtService;
 import org.example.dto.user.UserAuthDto;
+import org.example.dto.user.UserGetDto;
+import org.example.dto.user.UserGoogleAuthDto;
 import org.example.dto.user.UserRegisterDto;
 import org.example.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     private final UserService userService;
-    private final JwtService jwtService;
 
-    // Реєстрація нового користувача
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDto dto) {
+    @PostMapping(path = "/register", consumes = MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> register(@Valid @ModelAttribute UserRegisterDto dto) {
         try {
-            //log.info("Отримано запит на реєстрацію: {}", dto);
             userService.registerUser(dto);
-            return ResponseEntity.ok(Map.of("message", "Користувач успішно зареєстрований"));
+            return ResponseEntity.ok(Map.of("message", "Register success"));
         } catch (Exception e) {
-            //log.error("Помилка реєстрації", e);
-            return ResponseEntity.badRequest().body(Map.of("error", "Помилка при реєстрації: " + e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
-    // Логін користувача та отримання JWT токену
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserAuthDto userEntity) {
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody UserAuthDto dto) {
         try {
-            // Перевірка, чи існує користувач і чи правильні дані
-            String token = userService.authenticateUser(userEntity);
-            return ResponseEntity.ok("Bearer " + token);
+            String token = userService.authenticateUser(dto);
+            return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Помилка при вході: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", "Error with login: " + e.getMessage()));
         }
     }
 
+    @PostMapping("/google")
+    public ResponseEntity<Map<String, String>> googleLogin(@Valid @RequestBody UserGoogleAuthDto dto) {
+        try {
+            String token = userService.signInGoogle(dto.getToken());
+            return ResponseEntity.ok(Map.of("Bearer", token));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<UserGetDto> getUserInfo(@Valid @RequestParam("username") String username) {
+        try {
+            return ResponseEntity.ok(userService.getUserDto(username));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 }

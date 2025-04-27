@@ -13,6 +13,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/products")
 public class ProductController {
     @Autowired

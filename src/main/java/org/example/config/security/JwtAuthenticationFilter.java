@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -41,15 +44,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             if (jwtService.validate(jwt)) {
+                System.out.println("JWT is valid");
+                // 🔸 Отримай список ролей із токена
+                var claims = jwtService.getClaims(jwt);
+                var roles = claims.get("roles", List.class); // generic-safe версія нижче
+
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                if (roles != null) {
+                    authorities = ((List<?>) roles).stream()
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toString()))
+                            .toList();
+                }
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        userDetails.getAuthorities()
+                        authorities
                 );
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+            else {
+                System.out.println("JWT is not valid");
             }
         }
         filterChain.doFilter(request, response);

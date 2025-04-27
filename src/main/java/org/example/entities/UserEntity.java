@@ -17,6 +17,9 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column()
+    private String avatar;
+
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -25,4 +28,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRoleEntity> userRoles;
+
+    @Column(nullable = false)
+    private boolean isGoogleCreated;
 }
