@@ -24,8 +24,8 @@ public class AuthController {
     @PostMapping(path = "/register", consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> register(@Valid @ModelAttribute UserRegisterDto dto) {
         try {
-            userService.registerUser(dto);
-            return ResponseEntity.ok(Map.of("message", "Register success"));
+            String token = userService.registerUser(dto);
+            return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", e.getMessage()));

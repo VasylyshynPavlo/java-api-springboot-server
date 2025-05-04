@@ -25,6 +25,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/products").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/products**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").permitAll()
@@ -34,6 +35,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/user").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/google").permitAll()
 
                         .requestMatchers("/static/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
@@ -42,6 +44,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/rest-api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/images**").permitAll()
 
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()

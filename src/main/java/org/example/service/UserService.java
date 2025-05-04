@@ -54,7 +54,7 @@ public class UserService {
         return userMapper.toDto(foundUser);
     }
 
-    public void registerUser(UserRegisterDto dto) {
+    public String registerUser(UserRegisterDto dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new RuntimeException("User already exist");
         }
@@ -77,6 +77,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Role not found")));
         userRoleRepository.save(userRoleEntity);
 
+        return authenticateUser(new UserAuthDto(dto.getUsername(), dto.getPassword()));
     }
 
     public String authenticateUser(UserAuthDto userEntity) {
@@ -114,18 +115,18 @@ public class UserService {
                 new TypeReference<Map<String, String>>() {}
         );
 
-        String email = userInfo.get("email");
+        String username = userInfo.get("email");
         String pictureUrl = userInfo.get("picture");
 
-        String finalUsername = email;
+        String finalUsername = username;
         int suffix = 1;
         while (userRepository.existsByUsername(finalUsername)) {
-            finalUsername = email + suffix++;
+            finalUsername = username + suffix++;
         }
 
         String finalUsername1 = finalUsername;
         String finalUsername2 = finalUsername;
-        UserEntity userEntity = userRepository.findByUsername(email)
+        UserEntity userEntity = userRepository.findByUsername(username)
                 .map(existingUser -> {
                     if (existingUser.getUsername() == null || "немає".equals(existingUser.getUsername())) {
                         existingUser.setUsername(finalUsername1);
@@ -153,6 +154,12 @@ public class UserService {
         }
 
         userRepository.save(userEntity);
+
+        var userRoleEntity = new UserRoleEntity();
+        userRoleEntity.setUser(userEntity);
+        userRoleEntity.setRole(roleRepository.findByName("ADMIN")
+                .orElseThrow(() -> new RuntimeException("Role not found")));
+        userRoleRepository.save(userRoleEntity);
 
         return jwtService.generateAccessToken(userEntity);
     }
